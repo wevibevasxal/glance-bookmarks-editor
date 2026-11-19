@@ -1,0 +1,15 @@
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+*.env
+!tests/fixture/glance_data/.env
+node_modules/
+tests/container/glance
+tests/out/
+tests/bin/
+tests/ui/node_modules/
+!tests/container/old-editor/.env
+review/
+CLAUDE.local.md

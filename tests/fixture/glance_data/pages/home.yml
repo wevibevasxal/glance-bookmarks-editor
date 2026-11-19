@@ -1,0 +1,61 @@
+- name: Home
+  columns:
+    - size: small
+      widgets:
+      - type: calendar
+        first-day-of-week: sunday
+    - size: full
+      widgets:
+      - type: search
+        search-engine: duckduckgo
+        autofocus: true
+
+      # ---------- Web bookmarks ----------
+      - type: bookmarks
+        title: Bookmarks
+        groups:
+          - title: General
+            same-tab: true
+            hide-arrow: true
+            links:
+              - title: Gmail
+                url: https://mail.google.com/
+                icon: /assets/icons/gmail.webp
+              - title: Bank
+                url: https://bank.example.com/
+                icon: /assets/icons/bank.svg
+          - title: Finance
+            same-tab: true
+            hide-arrow: true
+            links:
+              - title: Budget
+                url: https://budget.example.com/
+                icon: /assets/icons/budget.svg
+
+      # ---------- Self-hosted apps ----------
+      - type: bookmarks
+        title: Apps
+        groups:
+          - title: Tools
+            same-tab: true
+            hide-arrow: true
+            links:
+              - title: Wiki
+                url: https://wiki.example.com/
+                icon: /assets/icons/outline.webp
+              - title: Notes
+                url: http://192.168.1.20:3000/
+                icon: /assets/icons/notes.svg
+          - title: Network & Security
+            same-tab: true
+            hide-arrow: true
+            links:
+              - title: NPM
+                url: https://npm.example.com/
+                icon: /assets/icons/nginx-proxy-manager.webp
+              - title: Glance Bookmarks
+                url: http://192.168.1.10:5000/
+                icon: /assets/icons/glance.webp
+    - size: small
+      widgets:
+      - $include: ../widgets/countdown.yml

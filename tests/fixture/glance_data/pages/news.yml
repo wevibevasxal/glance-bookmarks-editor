@@ -1,0 +1,13 @@
+- name: News
+  columns:
+    - size: full
+      widgets:
+      - type: reddit
+        subreddit: technology
+      - type: custom-api
+        title: Secret user
+        url: https://example.invalid/api
+        headers:
+          X-Api-Key: ${EXAMPLE_API_KEY}
+        template: |
+          <p>{{ .JSON.String "x" }}</p>

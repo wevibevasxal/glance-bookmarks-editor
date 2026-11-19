@@ -1,0 +1,37 @@
+# Countdown widget. Its options come from local/countdown.yml, which glance-bookmarks-editor edits.
+# It reads exactly birthday-1..3 and event-1..5 (the editor enforces the same limits).
+- type: custom-api
+  title: Countdown
+  cache: 1h
+  options:
+    $include: ../local/countdown.yml
+  template: |
+    {{- define "row" -}}
+      {{- $date := findMatch "^[0-9-]+" . -}}
+      {{- $name := findSubmatch "^[0-9-]+\\|([^|]+)" . -}}
+      {{- $emoji := "🎂" -}}
+      {{- if gt (len (findMatch "\\|.*\\|.*" .)) 0 }}{{ $emoji = findMatch "[^|]*$" . }}{{ end -}}
+      {{- $today := startOfDay now -}}
+      {{- $when := $today -}}
+      {{- if eq (len $date) 10 }}{{ $when = parseLocalTime "2006-01-02" $date -}}
+      {{- else }}{{ $when = parseLocalTime "2006-01-02" (printf "%d-%s" $today.Year $date) -}}
+        {{- if $when.Before $today }}{{ $when = $when.AddDate 1 0 0 }}{{ end -}}
+      {{- end -}}
+      {{- if not ($when.Before $today) -}}
+        {{- $days := div ($when.Sub $today).Hours 24 | toInt }}
+      <li class="flex justify-between">
+        <span>{{ $emoji }} {{ $name }}</span>
+        <span class="color-highlight">{{ if eq $days 0 }}today{{ else if eq $days 1 }}tomorrow{{ else }}in {{ $days }} days{{ end }}</span>
+      </li>
+      {{- end -}}
+    {{- end }}
+    <ul class="list list-gap-10">
+    {{- with .Options.StringOr "birthday-1" "" }}{{ template "row" . }}{{ end }}
+    {{- with .Options.StringOr "birthday-2" "" }}{{ template "row" . }}{{ end }}
+    {{- with .Options.StringOr "birthday-3" "" }}{{ template "row" . }}{{ end }}
+    {{- with .Options.StringOr "event-1" "" }}{{ template "row" . }}{{ end }}
+    {{- with .Options.StringOr "event-2" "" }}{{ template "row" . }}{{ end }}
+    {{- with .Options.StringOr "event-3" "" }}{{ template "row" . }}{{ end }}
+    {{- with .Options.StringOr "event-4" "" }}{{ template "row" . }}{{ end }}
+    {{- with .Options.StringOr "event-5" "" }}{{ template "row" . }}{{ end }}
+    </ul>

@@ -1,0 +1,14 @@
+server:
+  port: 8080
+  assets-path: /opt/glance_data/assets
+theme:
+  background-color: 0 0 0
+  primary-color: 24 97 58
+  negative-color: 209 88 54
+  custom-css-file: /assets/custom.css
+branding:
+  hide-footer: true
+  app-name: HOME
+pages:
+  - $include: pages/home.yml
+  - $include: pages/news.yml

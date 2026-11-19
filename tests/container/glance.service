@@ -1,0 +1,9 @@
+[Unit]
+Description=Glance
+After=network.target
+[Service]
+ExecStart=/opt/glance/glance --config /opt/glance_data/glance.yml
+WorkingDirectory=/opt/glance_data
+Restart=always
+[Install]
+WantedBy=multi-user.target

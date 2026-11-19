@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Glance Bookmarks</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/app.css?v={{VERSION}}">
+<script src="/static/vendor/Sortable.min.js?v={{VERSION}}" defer></script>
+<script src="/static/app.js?v={{VERSION}}" defer></script>
+</head>
+<body>
+<div id="boot" class="boot">Loading…</div>
+
+<!-- Login -->
+<main id="login" class="login" hidden>
+  <form id="login-form" class="card login-card" autocomplete="on">
+    <h1 class="brand">Glance <span>Bookmarks</span></h1>
+    <label>User <input name="user" autocomplete="username" required value="admin"></label>
+    <label>Password <input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="btn primary" type="submit">Sign in</button>
+    <p id="login-msg" class="msg" role="alert"></p>
+  </form>
+</main>
+
+<!-- App -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="brand">Glance <span>Bookmarks</span></div>
+    <nav class="tabs" id="nav">
+      <button data-view="links" class="active">Tiles</button>
+      <button data-view="countdown">Countdown</button>
+      <button data-view="icons">Icons</button>
+      <button data-view="history">History</button>
+    </nav>
+    <div class="top-right">
+      <a class="muted small" href="{{GLANCE_URL}}" target="_blank" rel="noopener" {{GLANCE_URL_HIDDEN}}>Open Glance ↗</a>
+      <button id="logout" class="btn ghost small">Sign out</button>
+    </div>
+  </header>
+
+  <section id="view-links" class="view">
+    <div class="toolbar">
+      <div class="subtabs" id="widget-tabs"></div>
+      <button id="add-section" class="btn ghost small" title="Add a section: a new bookmarks widget on the Home page">+ Section</button>
+      <div class="spacer"></div>
+      <button id="add-link" class="btn">+ Tile</button>
+      <button id="add-group" class="btn">+ Group</button>
+    </div>
+    <div class="section-head">
+      <span class="muted small">Section</span> <b id="section-name"></b>
+      <button id="rename-section" class="icon-btn" title="Rename this section">✎</button>
+      <button id="delete-section" class="icon-btn" title="Delete this section">✕</button>
+    </div>
+    <p class="hint">Each section is one bookmarks widget on your Home page; drag a section's tab to reorder them. Drag <span class="grip-sample">⠿</span> to reorder tiles and groups or to move a tile to another group. Changes are saved together with <b>Save</b>.</p>
+    <div id="groups" class="groups"></div>
+  </section>
+
+  <section id="view-countdown" class="view" hidden>
+    <div class="cd-grid">
+      <div class="card">
+        <div class="card-head"><h2>Birthdays</h2><span class="muted" id="bd-left"></span></div>
+        <p class="hint">Shown every year with 🎂. Up to 3.</p>
+        <div id="bd-list"></div>
+        <button id="bd-add" class="btn">+ Birthday</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Events</h2><span class="muted" id="ev-left"></span></div>
+        <p class="hint">Every year, or once (hidden after the date). Up to 5.</p>
+        <div id="ev-list"></div>
+        <button id="ev-add" class="btn">+ Event</button>
+      </div>
+    </div>
+    <div id="cd-problems" class="msg warn"></div>
+    <p class="hint">Holidays are in the Countdown widget itself (Claude-managed), not here.</p>
+  </section>
+
+  <section id="view-icons" class="view" hidden>
+    <div class="card">
+      <h2>Get an icon from selfh.st</h2>
+      <div class="icon-search-row">
+        <input id="lib-search" placeholder="Search selfh.st icons, e.g. immich" autocomplete="off">
+      </div>
+      <div id="lib-results" class="icon-results"></div>
+    </div>
+    <div class="toolbar">
+      <h2 class="grow">Icon library <span class="muted small" id="lib-count"></span></h2>
+      <input id="lib-filter" placeholder="Filter" autocomplete="off">
+    </div>
+    <div id="library" class="library"></div>
+  </section>
+
+  <section id="view-history" class="view" hidden>
+    <p class="hint">Every save keeps the previous file (last 30 of each). Restore runs through the same check as a save.</p>
+    <div class="cd-grid">
+      <div class="card"><h2>Tiles <span class="muted small">local/links.yml</span></h2><div id="hist-links"></div></div>
+      <div class="card"><h2>Countdown <span class="muted small">local/countdown.yml</span></h2><div id="hist-countdown"></div></div>
+    </div>
+  </section>
+
+  <div id="savebar" class="savebar" hidden>
+    <span id="savebar-text">Unsaved changes</span>
+    <button id="discard" class="btn ghost">Discard</button>
+    <button id="save" class="btn primary">Save</button>
+  </div>
+</div>
+
+<!-- Link form -->
+<dialog id="link-dlg" class="dlg">
+  <form method="dialog" id="link-form">
+    <h2 id="link-dlg-title">Tile</h2>
+    <label>Label <input name="title" required maxlength="100"></label>
+    <label>URL <input name="url" required maxlength="2000" placeholder="https://"></label>
+    <label>Group <select name="group"></select></label>
+    <div class="icon-field">
+      <div class="icon-current"><img id="lf-icon-img" alt=""><span id="lf-icon-name" class="muted small">No icon</span>
+        <button type="button" id="lf-icon-clear" class="btn ghost small">Remove icon</button></div>
+      <div class="subtabs small">
+        <button type="button" data-src="selfhst" class="active">selfh.st</button>
+        <button type="button" data-src="library">Existing icon</button>
+      </div>
+      <div id="lf-src-selfhst">
+        <input id="lf-search" placeholder="Search selfh.st, e.g. immich" autocomplete="off">
+        <div id="lf-results" class="icon-results compact"></div>
+        <label class="check"><input type="checkbox" id="lf-force"> Re-download even if the file already exists</label>
+      </div>
+      <div id="lf-src-library" hidden>
+        <input id="lf-lib-filter" placeholder="Filter" autocomplete="off">
+        <div id="lf-library" class="icon-results compact"></div>
+      </div>
+    </div>
+    <details class="advanced"><summary>Advanced</summary>
+      <label>Description <input name="description" maxlength="300" placeholder="shown under the label"></label>
+      <label>Open in <select name="same_tab">
+        <option value="">Group default</option><option value="true">Same tab</option><option value="false">New tab</option>
+      </select></label>
+    </details>
+    <p id="link-msg" class="msg" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" data-close>Cancel</button>
+      <button type="submit" class="btn primary" id="link-ok">OK</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Group form -->
+<dialog id="group-dlg" class="dlg narrow">
+  <form method="dialog" id="group-form">
+    <h2 id="group-dlg-title">Group</h2>
+    <label>Name <input name="title" maxlength="80"></label>
+    <p id="group-msg" class="msg" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" data-close>Cancel</button>
+      <button type="submit" class="btn primary">OK</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Confirm / info -->
+<dialog id="confirm-dlg" class="dlg narrow">
+  <form method="dialog">
+    <h2 id="confirm-title"></h2>
+    <p id="confirm-text"></p>
+    <pre id="confirm-pre" class="pre" hidden></pre>
+    <div class="dlg-actions">
+      <button value="cancel" class="btn ghost" id="confirm-cancel">Cancel</button>
+      <button value="ok" class="btn primary" id="confirm-ok">OK</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

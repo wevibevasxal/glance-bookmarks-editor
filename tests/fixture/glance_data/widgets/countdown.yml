@@ -1,0 +1,16 @@
+- type: custom-api
+  title: Countdown
+  cache: 1h
+  options:
+    $include: ../local/countdown.yml
+  template: |
+    <ul class="list list-gap-10">
+    {{ with .Options.StringOr "birthday-1" "" }}<li>birthday-1: {{ . }}</li>{{ end }}
+    {{ with .Options.StringOr "birthday-2" "" }}<li>birthday-2: {{ . }}</li>{{ end }}
+    {{ with .Options.StringOr "birthday-3" "" }}<li>birthday-3: {{ . }}</li>{{ end }}
+    {{ with .Options.StringOr "event-1" "" }}<li>event-1: {{ . }}</li>{{ end }}
+    {{ with .Options.StringOr "event-2" "" }}<li>event-2: {{ . }}</li>{{ end }}
+    {{ with .Options.StringOr "event-3" "" }}<li>event-3: {{ . }}</li>{{ end }}
+    {{ with .Options.StringOr "event-4" "" }}<li>event-4: {{ . }}</li>{{ end }}
+    {{ with .Options.StringOr "event-5" "" }}<li>event-5: {{ . }}</li>{{ end }}
+    </ul>

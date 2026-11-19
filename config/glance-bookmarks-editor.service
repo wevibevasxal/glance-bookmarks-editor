@@ -1,0 +1,20 @@
+# Managed by glance-bookmarks-editor install.sh. Re-run install.sh instead of editing.
+[Unit]
+Description=Glance link editor (glance-bookmarks-editor)
+After=network-online.target glance.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Runs as root: it validates with Glance's root-only .env and writes into the Glance data directory.
+# Keep port 5000 reachable only from your reverse proxy, and put it behind HTTPS and the editor's login.
+Environment=GE_SETTINGS=/etc/glance-bookmarks-editor/env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -I /opt/glance-bookmarks-editor/main.py serve
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+UMask=0022
+
+[Install]
+WantedBy=multi-user.target

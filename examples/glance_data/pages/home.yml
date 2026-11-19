@@ -1,0 +1,40 @@
+# The Home page. The `type: bookmarks` widgets below (next to each other in the same column; any number,
+# any titles) are what `install.sh --migrate` moves into local/links.yml. After that, add, rename or remove
+# them in the editor as sections.
+# After the migration, they are replaced here by:   - $include: ../local/links.yml
+- name: Home
+  columns:
+    - size: small
+      widgets:
+      - type: calendar
+        first-day-of-week: monday
+
+    - size: full
+      widgets:
+      - type: search
+        search-engine: duckduckgo
+
+      - type: bookmarks
+        title: Bookmarks
+        groups:
+          - title: General
+            same-tab: true
+            links:
+              - title: GitHub
+                url: https://github.com/
+              - title: Wikipedia
+                url: https://www.wikipedia.org/
+
+      - type: bookmarks
+        title: Apps
+        groups:
+          - title: Self-hosted
+            same-tab: true
+            links:
+              - title: Glance Bookmarks
+                url: http://192.168.1.10:5000/
+
+    - size: small
+      widgets:
+      # Optional: remove this line (and widgets/countdown.yml, local/countdown.yml) if you don't want it.
+      - $include: ../widgets/countdown.yml
